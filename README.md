@@ -4,7 +4,7 @@ Story-Based Learning Web Application for Computer Science (Age 8–10)
 
 ## 1. Introduction
 
-This project is being developed as part of our ongoing *Bootcamp Project. The main goal is to create a **story-based web application* that teaches basic *Computer Science concepts* to children aged *8–10 years* in a fun, interactive, and engaging way.
+This project is being developed as part of our ongoing *Bootcamp Project. The main goal is to create a *story-based web application* that teaches basic *Computer Science concepts* to children aged *8–10 years* in a fun, interactive, and engaging way.
 
 Instead of traditional learning methods, this application uses *stories, characters, and small tasks* to help students understand concepts easily and enjoy the learning process.
 
@@ -74,10 +74,10 @@ The application will cover basic computer science topics such as:
 
 ## 8. Technology Stack
 
-* *Frontend: React.js
-* *Backend: Django 
-* *Database: SQLite (Development) / PostgreSQL (Production – planned)
-* *Design Tools: Figma
+* Frontend: React.js
+* Backend: Django 
+* Database: SQLite (Development) / PostgreSQL (Production – planned)
+* Design Tools: Figma
 
 
 ## 9. System Workflow
@@ -110,14 +110,19 @@ The application will cover basic computer science topics such as:
 ## 12. Key Learnings
 
 Through developing ByteTales during the bootcamp, our team gained valuable insights:
+
 * Storytelling helps learning:
 Using stories makes difficult computer concepts like algorithms easier to understand. Students remember lessons 30–50% better compared to only memorizing.
+
 * Design for children:
 Testing our designs showed that bright colors, big buttons, and simple words help 8–10-year-old children feel less confused and frustrated.
+
 * Full-stack development learning:
 Working with React.js and Django together helped us learn how to share data properly, give instant feedback, and track student progress.
+
 * Agile development helps work faster:
 Daily meetings and short work cycles helped us build a working version of the project quickly and improve it using feedback.
+
 * Engagement improves learning:
 Adding rewards like badges motivated children to complete more tasks, showing that gamification makes learning more fun and effective.
 
