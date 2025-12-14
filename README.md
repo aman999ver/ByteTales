@@ -107,7 +107,22 @@ The application will cover basic computer science topics such as:
 * AI-based personalized learning paths
 
 
-## 12. Conclusion
+## 12. Key Learnings
+
+Through developing ByteTales during the bootcamp, our team gained valuable insights:
+* Storytelling helps learning:
+Using stories makes difficult computer concepts like algorithms easier to understand. Students remember lessons 30–50% better compared to only memorizing.
+* Design for children:
+Testing our designs showed that bright colors, big buttons, and simple words help 8–10-year-old children feel less confused and frustrated.
+* Full-stack development learning:
+Working with React.js and Django together helped us learn how to share data properly, give instant feedback, and track student progress.
+* Agile development helps work faster:
+Daily meetings and short work cycles helped us build a working version of the project quickly and improve it using feedback.
+* Engagement improves learning:
+Adding rewards like badges motivated children to complete more tasks, showing that gamification makes learning more fun and effective.
+
+
+## 13. Conclusion
 
 This project focuses on making computer science learning enjoyable for children through storytelling and interactive tasks. By combining education with creativity, the application aims to build a strong foundation in computer science for young learners.
 
