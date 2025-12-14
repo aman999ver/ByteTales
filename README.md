@@ -75,7 +75,7 @@ The application will cover basic computer science topics such as:
 ## 8. Technology Stack
 
 * *Frontend: React.js
-* *Backend: Django
+* *Backend: Django or nodejs
 * *Database: SQLite (Development) / PostgreSQL (Production – planned)
 * *Design Tools: Figma
 
