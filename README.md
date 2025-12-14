@@ -109,24 +109,27 @@ The application will cover basic computer science topics such as:
 
 ## 12. Key Learnings
 
-Through developing ByteTales during the bootcamp, our team gained valuable insights:
+In week 1 of the bootcamp, our SAS Tech Group G planned ByteTales on the ReadyIT platform. We learned:
 
-* Storytelling helps learning:
-Using stories makes difficult computer concepts like algorithms easier to understand. Students remember lessons 30–50% better compared to only memorizing.
+* Know your learners:
+8–10-year-old children learn better with stories instead of long lectures, so we designed lessons accordingly using Django.
 
-* Design for children:
-Testing our designs showed that bright colors, big buttons, and simple words help 8–10-year-old children feel less confused and frustrated.
+* Design makes learning fun:
+Stories with small tasks, along with stars and badges, help kids enjoy lessons and remember better.
 
-* Full-stack development learning:
-Working with React.js and Django together helped us learn how to share data properly, give instant feedback, and track student progress.
+* Instructional planning is important:
+Planning carefully ensures that learning goals match interactive activities, rather than just turning content into web pages.
 
-* Agile development helps work faster:
-Daily meetings and short work cycles helped us build a working version of the project quickly and improve it using feedback.
+* Instructional planning is important:
+Planning carefully ensures that learning goals match interactive activities, rather than just turning content into web pages.
 
-* Engagement improves learning:
-Adding rewards like badges motivated children to complete more tasks, showing that gamification makes learning more fun and effective.
+* Consistent experience for all children:
+Bright colors and big buttons make the platform easy and enjoyable on any device.
 
+* Track progress from the start:
+Planning feedback and progress tracking early helps improve the platform later.
 
+These Week 1 learnings gave us a strong foundation to build ByteTales effectively.
 ## 13. Conclusion
 
 This project focuses on making computer science learning enjoyable for children through storytelling and interactive tasks. By combining education with creativity, the application aims to build a strong foundation in computer science for young learners.
