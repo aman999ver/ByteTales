@@ -1,0 +1,156 @@
+ByteTales - Interactive Computer Science Learning Platform
+Project Assignment / Technical Documentation
+================================================================================
+
+1. PROJECT OVERVIEW & OBJECTIVE
+--------------------------------------------------------------------------------
+ByteTales is an interactive, gamified educational platform designed specifically 
+for children aged 8-10 to learn Computer Science concepts. Unlike traditional 
+coding tools, ByteTales uses a narrative-driven approach ("Story Lessons") where 
+concepts like Input/Output, Hardware history, and Logic Gates are taught through 
+animated storytelling and character-based adventures (e.g., "Robo-Ant").
+
+Key Objectives:
+- Simplify complex CS concepts using visual storytelling and videos.
+- Engage students with gamification (XP, Levels, Badges, Visual Progress).
+- Provide a structured learning path ("Chapters") rather than open-ended coding.
+- Enable teachers to track student engagement and performance.
+
+Technical Stack:
+- Frontend: React.js (Vite) for dynamic UI and component management.
+- Styling: Tailwind CSS for a modern, responsive, and playful "kid-friendly" design.
+- Architecture: Role-Based Access Control (RBAC) covering Student, Teacher, and Admin.
+
+--------------------------------------------------------------------------------
+
+2. FRONTEND VISUALIZATION & COMPONENTS
+--------------------------------------------------------------------------------
+The application is divided into three distinct portals based on the user role.
+
+A. LANDING / ENTRY
+   - Page: Landing Page
+     - Purpose: Serves as the central gateway.
+     - Features: clearly distinct entry cards for "Student", "Teacher", and "Admin" 
+       to route users to their respective dashboards.
+
+B. STUDENT PANEL (The Learning Experience)
+   - Page: Student Dashboard
+     - Purpose: The student's "Home Base". Displays current progress and available chapters.
+     - Visuals: Simple "Chapter Grid" (e.g., "Input & Output", "History of Computer").
+       Shows status (Playable/Locked) and visual icons (Monitor, History).
+   
+   - Page: Story Adventure (Lesson View)
+     - Purpose: The core learning interface.
+     - Flow: Interleaved Video -> Quiz -> Video sequence.
+     - Visuals: 
+       - "Video Player" for story parts (Part 1: Input, Part 2: Output).
+       - "Quiz Card" for checkpoint questions with instant feedback (Green/Red highlights).
+       - "Progress Bar" to track adventure completion.
+
+   - Page: My Profile
+     - Purpose: Gamification hub to motivate the student.
+     - Visuals: 
+       - Avatar Display (e.g., Sneha Sing).
+       - XP Progress Bar & Level Indicator.
+       - "Badge Collection" grid showing earned achievements (e.g., "Quiz Master").
+
+C. TEACHER PANEL (Classroom Management)
+   - Page: Teacher Dashboard
+     - Purpose: Quick overview of class activity.
+     - Features: Summary stats (Active Students, Course Completion).
+   
+   - Page: Manage Lessons
+     - Purpose: Content control center.
+     - Features: List view of lessons with status (Active/Draft) and edit/delete actions.
+
+   - Page: Student Progress
+     - Purpose: Detailed tracking.
+     - Features: Table showing each student's name, progress %, status (Ahead/Behind), 
+       and last active timestamp.
+
+   - Page: Settings
+     - Purpose: Personal account management.
+     - Features: Profile editing (e.g., Teacher Santosh) and notification toggles.
+
+D. ADMIN PANEL (Platform Administration)
+   - Page: Admin Dashboard
+     - Purpose: System health and high-level metrics.
+     - Features: Application growth stats, total user counts.
+
+   - Page: User Management
+     - Purpose: Account administration.
+     - Features: Tabbed table to filter Students vs. Teachers, with "Add User" modal.
+
+   - Page: Content Management
+     - Purpose: Curriculum oversight.
+     - Features: High-level view of all courses and enrollment numbers across the platform.
+
+--------------------------------------------------------------------------------
+
+3. DATABASE FIELDS MAPPING
+--------------------------------------------------------------------------------
+Below is the proposed database schema mapping for the frontend components described above.
+
+[Users Table]
+- id              (PK, Integer): Unique User ID
+- name            (String): Full Name (e.g., "Sneha Sing")
+- email           (String): Login Email
+- password_hash   (String): Secure Password
+- role            (Enum): 'student', 'teacher', 'admin'
+- avatar_seed     (String): Seed for generating user avatar
+- created_at      (Timestamp)
+
+[Student_Stats Table] (Linked to Users)
+- user_id         (FK, Integer)
+- level           (Integer): Current Level (e.g., 5)
+- current_xp      (Integer): Experience Points (e.g., 2450)
+- next_level_xp   (Integer): Milestone for next level
+- total_lessons   (Integer): Number of completed lessons
+
+[Courses/Chapters Table]
+- id              (PK, Integer)
+- title           (String): Chapter Title (e.g., "Input & Output")
+- description     (Text)
+- status          (Enum): 'active', 'draft', 'archived'
+- thumbnail_color (String): UI color theme (e.g., 'blue', 'purple')
+
+[Course_Steps Table] (The content flow)
+- id              (PK, Integer)
+- course_id       (FK, Integer)
+- step_order      (Integer): Sequence number (1, 2, 3...)
+- step_type       (Enum): 'video', 'quiz', 'text'
+- content_url     (String): URL for the video file or image asset
+- text_content    (Text): Instructional text or story dialogue
+
+[Quiz_Questions Table]
+- id              (PK, Integer)
+- step_id         (FK, Integer): Links quiz to a specific course step
+- question_text   (String): The question prompt
+- option_a        (String)
+- option_b        (String)
+- option_c        (String)
+- correct_option  (Char): 'a', 'b', or 'c'
+- explanation     (Text): Feedback shown after answering
+
+[Student_Progress Table]
+- id              (PK, Integer)
+- user_id         (FK, Integer)
+- course_id       (FK, Integer)
+- status          (Enum): 'not_started', 'in_progress', 'completed'
+- current_step    (Integer): Last step accessed
+- last_active     (Timestamp)
+
+[Badges Table]
+- id              (PK, Integer)
+- name            (String): Badge Title (e.g., "First Code")
+- icon_code       (String): Icon identifier (e.g., "rocket")
+- description     (String)
+
+[User_Badges Table]
+- id              (PK, Integer)
+- user_id         (FK, Integer)
+- badge_id        (FK, Integer)
+- earned_at       (Timestamp)
+
+================================================================================
+End of Assignment Document
