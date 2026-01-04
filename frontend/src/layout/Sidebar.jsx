@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, BookOpen, BrainCircuit, Users, Settings, Code, Shield } from 'lucide-react';
 import { cn } from '../lib/utils';
+import logo from '../assets/logo.png';
 
 const Sidebar = ({ role = 'student' }) => {
     const menus = {
@@ -36,7 +37,7 @@ const Sidebar = ({ role = 'student' }) => {
     return (
         <div className="w-64 h-screen bg-white border-r border-slate-200 flex flex-col fixed left-0 top-0">
             <div className="p-6 flex items-center gap-3">
-                <img src="/src/assets/logo.png" alt="ByteTales Logo" className="w-10 h-10 object-contain" />
+                <img src={logo} alt="ByteTales Logo" className="w-10 h-10 object-contain" />
                 <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-blue to-brand-purple">
                     ByteTales
                 </span>

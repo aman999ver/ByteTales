@@ -3,6 +3,7 @@ import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
 import { User, BookOpen, Shield, ArrowRight, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 
 const Landing = () => {
     const roles = [
@@ -36,7 +37,7 @@ const Landing = () => {
         <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
             <div className="text-center mb-12">
                 <div className="flex items-center justify-center gap-3 mb-4">
-                    <img src="/src/assets/logo.png" alt="ByteTales Logo" className="w-16 h-16 object-contain animate-bounce" />
+                    <img src={logo} alt="ByteTales Logo" className="w-16 h-16 object-contain animate-bounce" />
                     <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-blue to-brand-purple">
                         ByteTales
                     </h1>
