@@ -83,12 +83,6 @@ const Sidebar = ({ role = 'student', isOpen, onClose }) => {
                 </nav>
 
                 <div className="p-4 border-t border-slate-100 space-y-4">
-                    {/* Logout Button */}
-                    <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 font-medium transition-colors">
-                        <LogOut size={20} />
-                        Logout
-                    </Link>
-
                     <div className="bg-slate-50 p-4 rounded-xl flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-brand-purple text-white flex items-center justify-center font-bold">
                             {currentUser.initials}
@@ -98,6 +92,12 @@ const Sidebar = ({ role = 'student', isOpen, onClose }) => {
                             <p className="text-xs text-slate-500 capitalize">{role}</p>
                         </div>
                     </div>
+
+                    {/* Logout Button */}
+                    <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 font-medium transition-colors justify-center border border-red-100">
+                        <LogOut size={20} />
+                        Logout
+                    </Link>
                 </div>
             </div>
         </>
