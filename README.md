@@ -1,48 +1,95 @@
-# ByteTales: Early Computer Science Adventures
+# ByteTales: Interactive Computer Science Learning Platform
 
-A full-stack educational web application for kids to learn CS concepts.
+**ByteTales** is a gamified educational platform designed to teach Computer Science concepts to kids through interactive stories and quizzes.
 
-## Prerequisites
-- Node.js & npm
-- Python 3.10+
-- MongoDB (Running locally on default port 27017 or update `backend/.env`)
+Developed by **SAS Tech Group G**:
+- 👨‍💻 **Aman Verma**
+- 👨‍💻 **Santosh Yadav**
+- 👨‍💻 **Sneha Singh**
 
-## Setup Instructions
+---
 
-### 1. Database
-Ensure MongoDB is running.
-`mongod`
+## 🚀 Quick Start Guide
 
-### 2. Backend
-Open a terminal in `backend/`:
+Follow these steps to get the project running in minutes.
+
+### 1. Prerequisites
+- **Node.js** (v16+)
+- **Python** (v3.10+)
+- **MongoDB** (Ensure it is running locally or have a connection string ready)
+
+### 2. Clone the Repository
 ```bash
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# Linux/Mac
-# source venv/bin/activate
-
-pip install -r requirements.txt
-# Note: face_recognition might fail on Windows. The app has a fallback/mock mode.
+git clone https://github.com/aman999ver/ByteTales.git
+cd ByteTales
 ```
 
-Run the server:
-```bash
-uvicorn app.main:app --reload --port 8000
-```
+### 3. Backend Setup
+Navigate to the backend folder and set up the environment.
 
-### 3. Frontend
-Open a new terminal in `frontend/`:
-```bash
-npm install
-npm run dev
-```
+1.  **Create and Activate Virtual Environment:**
+    ```bash
+    cd backend
+    python -m venv venv
+    # Windows:
+    .\venv\Scripts\activate
+    # Mac/Linux:
+    # source venv/bin/activate
+    ```
 
-Visit `http://localhost:5173`.
+2.  **Install Dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## Demo Flow
-1. Go to `/admin` and click "Seed Demo Data".
-2. Go to `/register`. Register with name, email, password, and Capture Face.
-3. Login using Face or Password.
-4. In Dashboard, click on "The Binary Forest".
-5. Read parts. At the end, take the Quiz.
+3.  **Configure Database:**
+    - Create a `.env` file in the `backend/` directory.
+    - Add your MongoDB connection string (default local):
+      ```env
+      MONGODB_URI=mongodb://localhost:27017
+      SECRET_KEY=your_super_secret_key_here
+      ALGORITHM=HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES=30
+      ```
+
+4.  **Run the Server:**
+    ```bash
+    uvicorn app.main:app --reload --port 8000
+    ```
+    *The backend will start at `http://localhost:8000`*
+
+### 4. Frontend Setup
+Open a new terminal and navigate to the frontend folder.
+
+1.  **Install Dependencies:**
+    ```bash
+    cd frontend
+    npm install
+    ```
+
+2.  **Start the Development Server:**
+    ```bash
+    npm run dev
+    ```
+    *The application will start at `http://localhost:5173`*
+
+---
+
+## 🌟 Key Features
+
+- **Interactive Stories:** Learn loops, variables, and logic through fantasy adventures.
+- **Gamification:** Earn XP, badges, and unlock new avatars.
+- **Face Authentication:** Login securely using facial recognition.
+- **Admin Panel:** specialized dashboard to manage students, stories, and quizzes.
+- **Responsive Design:** Optimized for Desktops, Tablets, and Mobile devices.
+
+## 🛠 Tech Stack
+
+- **Frontend:** React, Vite, Framer Motion
+- **Backend:** FastAPI, Python
+- **Database:** MongoDB
+- **Authentication:** JWT, face_recognition
+
+---
+
+© 2026 ByteTales | Built with ❤️ by **SAS Tech Group G**

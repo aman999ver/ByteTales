@@ -12,8 +12,10 @@ router = APIRouter(prefix="/stories", tags=["stories"])
 # Helper dependency for admin check
 def get_current_admin(user: StudentDB = Depends(get_current_user)):
     if user.role != "admin":
-         # In production, raise 403. For demo, we might be lenient or strict.
-         pass 
+         raise HTTPException(
+             status_code=status.HTTP_403_FORBIDDEN,
+             detail="You do not have admin privileges"
+         )
     return user
 
 # Basic Story CRUD

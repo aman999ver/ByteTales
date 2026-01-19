@@ -98,6 +98,8 @@ async def update_student_me(student_update: StudentUpdate, current_user: Student
 # 5. Get All Students (Admin)
 @router.get("/", response_model=List[StudentDB])
 async def get_all_students(current_user: StudentDB = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
     # This endpoint caused 404 before because it might have been missing or file not loaded
     students = await db.students.find().to_list(100)
     return students
