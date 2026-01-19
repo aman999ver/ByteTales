@@ -1,0 +1,123 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&family=Press+Start+2P&display=swap');
+
+:root {
+  --bg-color: #e0f7fa;
+  --primary: #5e35b1;
+  /* Deep Purple */
+  --accent: #00e676;
+  /* Bright Green */
+  --warning: #ff1744;
+  --text-main: #263238;
+  --card-bg: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Fredoka', sans-serif;
+  background-color: var(--bg-color);
+  background-image:
+    radial-gradient(#b2ebf2 15%, transparent 16%),
+    radial-gradient(#b2ebf2 15%, transparent 16%);
+  background-size: 60px 60px;
+  background-position: 0 0, 30px 30px;
+  color: var(--text-main);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Press Start 2P', cursive;
+  color: var(--primary);
+  line-height: 1.5;
+  text-shadow: 2px 2px 0px #b39ddb;
+}
+
+button {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.8rem;
+  background-color: var(--primary);
+  color: white;
+  border: 4px solid #311b92;
+  border-radius: 10px;
+  padding: 15px 25px;
+  cursor: pointer;
+  box-shadow: 5px 5px 0px #311b92;
+  transition: all 0.1s;
+  text-transform: uppercase;
+}
+
+button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0px #311b92;
+  background-color: #673ab7;
+}
+
+button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #311b92;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 4px solid var(--primary);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border: 2px dashed #b39ddb;
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+input {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 3px solid #b0bec5;
+  border-radius: 12px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.1rem;
+  background: #fafafa;
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(0, 230, 118, 0.2);
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  color: #546e7a;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e0f7fa;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border: 3px solid #e0f7fa;
+  border-radius: 10px;
+}
