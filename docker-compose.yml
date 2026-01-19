@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4007:4007"
+    restart: always
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM:-HS256}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+    env_file:
+      - ./backend/.env
+    networks:
+      - bytetales-network
+
+  main:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://team7.cbit.site:4007
+    ports:
+      - "8007:8007"
+    restart: always
+    depends_on:
+      - api
+    networks:
+      - bytetales-network
+
+networks:
+  bytetales-network:
+    driver: bridge
