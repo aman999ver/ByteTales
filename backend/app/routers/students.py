@@ -6,39 +6,12 @@ from pydantic import BaseModel
 from ..auth import get_password_hash, verify_password, create_access_token, get_current_user
 from typing import List, Optional
 import numpy as np
+from ..utils import update_streak
 
 router = APIRouter(prefix="/students", tags=["students"])
 
 class FaceLoginRequest(BaseModel):
     encoding: List[float]
-
-# 1. Register
-@router.post("/register", response_model=Token)
-async def register_student(request: Request):
-    try:
-        data = await request.json()
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Invalid JSON")
-
-    try:
-        student_data = StudentCreate(**data)
-    except Exception as e:
-        raise HTTPException(status_code=422, detail=str(e))
-    
-    if await db.students.find_one({"email": student_data.email}):
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    hashed_pwd = get_password_hash(student_data.password)
-    student = StudentDB(
-        name=student_data.name,
-        email=student_data.email,
-        hashed_password=hashed_pwd,
-        face_encoding=student_data.face_encoding
-    )
-    
-    await db.students.insert_one(student.model_dump(by_alias=True, exclude={"id"}))
-    access_token = create_access_token(data={"sub": student_data.email})
-    return {"access_token": access_token, "token_type": "bearer"}
 
 # 2. Login
 @router.post("/login", response_model=Token)
@@ -50,6 +23,10 @@ async def login_student(form_data: OAuth2PasswordRequestForm = Depends()):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    # Update Streak
+    await update_streak(user["email"])
+    
     access_token = create_access_token(data={"sub": user["email"]})
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -75,6 +52,9 @@ async def face_login(request: FaceLoginRequest):
             best_match = student
             
     if best_match:
+        # Update Streak
+        await update_streak(best_match["email"])
+        
         access_token = create_access_token(data={"sub": best_match["email"]})
         return {"access_token": access_token, "token_type": "bearer"}
     
@@ -96,7 +76,7 @@ async def update_student_me(student_update: StudentUpdate, current_user: Student
     return current_user
 
 # 5. Get All Students (Admin)
-@router.get("/", response_model=List[StudentDB])
+@router.get("", response_model=List[StudentDB])
 async def get_all_students(current_user: StudentDB = Depends(get_current_user)):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not authorized")

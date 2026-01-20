@@ -37,7 +37,6 @@ function Admin() {
     }, []);
 
     useEffect(() => {
-        // Initial Fetch
         fetchStories();
         fetchStudents();
     }, []);
@@ -45,7 +44,6 @@ function Admin() {
     const fetchStories = async () => {
         try {
             const res = await api.get('/stories');
-            // Safety check
             setStories(Array.isArray(res.data) ? res.data : []);
         } catch (e) {
             console.error(e);
@@ -58,8 +56,7 @@ function Admin() {
             const res = await api.get('/students');
             setStudents(Array.isArray(res.data) ? res.data : []);
         } catch (e) {
-            console.error("Need admin auth for students", e);
-            // Don't block UI, just empty list
+            console.error(e);
             setStudents([]);
         }
     };
@@ -87,25 +84,18 @@ function Admin() {
     const cleanVideoUrl = (input) => {
         if (!input) return "";
         if (typeof input !== 'string') return "";
-
-        // 1. Handle iframe code
         if (input.includes("<iframe")) {
             const srcMatch = input.match(/src="([^"]+)"/);
             return srcMatch ? srcMatch[1] : input;
         }
-
-        // 2. Handle standard YouTube URL (watch?v=)
         if (input.includes("youtube.com/watch?v=")) {
             const videoId = input.split("v=")[1]?.split("&")[0];
             return videoId ? `https://www.youtube.com/embed/${videoId}` : input;
         }
-
-        // 3. Handle short YouTube URL (youtu.be/)
         if (input.includes("youtu.be/")) {
             const videoId = input.split("youtu.be/")[1]?.split("?")[0];
             return videoId ? `https://www.youtube.com/embed/${videoId}` : input;
         }
-
         return input;
     };
 
@@ -124,12 +114,10 @@ function Admin() {
         try {
             let res;
             if (editingPartIndex !== null) {
-                // Update
                 res = await api.put(`/stories/${selectedStory._id}/parts/${editingPartIndex}`, payload);
                 alert("Part Updated! ✅");
                 setEditingPartIndex(null);
             } else {
-                // Create
                 res = await api.put(`/stories/${selectedStory._id}/parts`, payload);
                 alert("Part Added! ➕");
             }
@@ -146,7 +134,6 @@ function Admin() {
         if (!selectedStory || !selectedStory.parts) return;
         const p = selectedStory.parts[index];
         if (!p) return;
-
         setPartTitle(p.title || '');
         setPartContent(p.content || '');
         setVideoUrl(p.video_url || "");
@@ -184,226 +171,361 @@ function Admin() {
     const saveQuiz = async () => {
         if (currentQuestions.length === 0) return alert("Add at least one question");
         try {
-            const res = await api.post('/stories/quizzes', {
-                story_part_id: "manual",
-                questions: currentQuestions
-            });
+            const res = await api.post('/stories/quizzes', { story_part_id: "manual", questions: currentQuestions });
             setCreatedQuizId(res.data._id);
             setCurrentQuestions([]);
             alert(`Quiz Created! ID: ${res.data._id}`);
         } catch (e) { alert("Quiz save failed"); }
     };
 
-    // --- Render ---
-    // Safety Wrap: If anything above throws, React will try to render. But logical errors inside render are common.
-    // We use ? everywhere.
-
-    // --- Render ---
     const isMobile = windowWidth < 768;
 
     return (
-        <div style={{ padding: '20px', minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'sans-serif' }}>
-            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', background: '#2c3e50', padding: '15px', borderRadius: '10px', color: 'white', gap: isMobile ? '15px' : '0' }}>
-                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', gap: '20px', width: isMobile ? '100%' : 'auto' }}>
-                    <h1 style={{ margin: 0, fontSize: isMobile ? '1.5rem' : '2rem', color: '#ecf0f1' }}>🛡️ Admin</h1>
-                    <div style={{ display: 'flex', gap: '5px', overflowX: 'auto', maxWidth: '100%', paddingBottom: '5px' }}>
-                        <button onClick={() => setActiveTab('stories')} style={tabStyle(activeTab === 'stories')}>📖 Stories</button>
-                        <button onClick={() => setActiveTab('students')} style={tabStyle(activeTab === 'students')}>🎓 Students</button>
-                        <button onClick={() => setActiveTab('quizzes')} style={tabStyle(activeTab === 'quizzes')}>❓ Quizzes</button>
-                    </div>
-                </div>
-                <div style={{ display: 'flex', gap: '10px', width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'center' : 'flex-end' }}>
-                    <button onClick={() => navigate('/')} style={{ background: '#34495e', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' }}>🏠 Home</button>
-                    <button
-                        onClick={() => {
-                            localStorage.removeItem('token');
-                            window.location.href = '/admin/login';
-                        }}
-                        style={{ background: '#e74c3c', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
-                    >
-                        Logout 🚪
-                    </button>
-                </div>
-            </div>
+        <div className="admin-wrapper">
+            <style>
+                {`
+                    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+                    
+                    .admin-wrapper {
+                        min-height: 100vh;
+                        background: #f1f5f9;
+                        font-family: 'Outfit', sans-serif;
+                        display: flex;
+                        flex-direction: column;
+                    }
 
-            {error && <div style={{ padding: '10px', background: 'red', color: 'white', marginBottom: '10px' }}>{error}</div>}
+                    /* Header */
+                    .admin-header {
+                        background: #0f172a;
+                        color: white;
+                        padding: 15px 30px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        position: sticky;
+                        top: 0;
+                        z-index: 50;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    }
 
-            {/* STORIES TAB */}
-            {activeTab === 'stories' && (
-                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '20px', flex: 1 }}>
-                    {/* List */}
-                    <div style={{ flex: 1, order: isMobile ? 2 : 1 }}>
-                        <div className="card">
-                            <h3>Create New Story</h3>
-                            <form onSubmit={createStory} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Title" required style={{ padding: '8px' }} />
-                                <input value={desc} onChange={e => setDesc(e.target.value)} placeholder="Description" required style={{ padding: '8px' }} />
-                                <button type="submit" style={btnStyle('#4ECDC4')}>Create</button>
-                            </form>
-                        </div>
-                        <h3>Library ({stories?.length || 0})</h3>
-                        {Array.isArray(stories) && stories.map(s => (
-                            <div key={s._id} onClick={() => { setSelectedStory(s); if (isMobile) window.scrollTo(0, 400); }} style={{ ...itemStyle, border: selectedStory?._id === s._id ? '2px solid #4ECDC4' : '1px solid #ddd' }}>
-                                <strong>{s.title}</strong>
-                                <small style={{ display: 'block', color: '#666' }}>{s.parts?.length || 0} parts</small>
-                                <button onClick={(e) => deleteStory(s._id, e)} style={{ ...btnStyle('red'), position: 'absolute', right: '10px', top: '10px', padding: '5px 10px' }}>🗑️</button>
+                    .admin-nav {
+                        display: flex;
+                        gap: 10px;
+                        background: rgba(255,255,255,0.1);
+                        padding: 5px;
+                        border-radius: 8px;
+                    }
+
+                    .nav-btn {
+                        background: transparent;
+                        border: none;
+                        color: #94a3b8;
+                        padding: 8px 16px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        transition: all 0.2s;
+                    }
+                    .nav-btn.active {
+                        background: #3b82f6;
+                        color: white;
+                    }
+                    .nav-btn:hover:not(.active) {
+                        color: white;
+                        background: rgba(255,255,255,0.05);
+                    }
+
+                    /* Content */
+                    .admin-content {
+                        padding: 30px;
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        width: 100%;
+                        box-sizing: border-box;
+                    }
+
+                    .section-card {
+                        background: white;
+                        border-radius: 12px;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                        border: 1px solid #e2e8f0;
+                        padding: 24px;
+                        margin-bottom: 24px;
+                    }
+
+                    .form-input {
+                        width: 100%;
+                        padding: 10px 12px;
+                        border: 1px solid #cbd5e1;
+                        border-radius: 6px;
+                        font-size: 0.95rem;
+                        background: #f8fafc;
+                        transition: 0.2s;
+                        outline: none;
+                        box-sizing: border-box;
+                        margin-bottom: 10px;
+                    }
+                    .form-input:focus {
+                        border-color: #3b82f6;
+                        background: white;
+                        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+                    }
+
+                    .primary-btn {
+                        background: #3b82f6;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: 0.2s;
+                    }
+                    .primary-btn:hover { background: #2563eb; }
+
+                    .danger-btn {
+                        background: #ef4444; color: white; border: none; padding: 6px 12px;
+                        border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+                    }
+                    .danger-btn:hover { background: #dc2626; }
+
+                    .edit-btn {
+                        background: #f59e0b; color: white; border: none; padding: 6px 12px;
+                        border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; margin-right: 5px;
+                    }
+                    .edit-btn:hover { background: #d97706; }
+
+                    /* List Items */
+                    .list-item {
+                        padding: 15px;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 8px;
+                        margin-bottom: 10px;
+                        background: white;
+                        cursor: pointer;
+                        transition: 0.2s;
+                        position: relative;
+                    }
+                    .list-item:hover { border-color: #3b82f6; background: #eff6ff; }
+                    .list-item.selected { border-color: #3b82f6; background: #eff6ff; ring: 2px solid rgba(59, 130, 246, 0.5); }
+
+                    /* Table */
+                    .data-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    .data-table th {
+                        text-align: left;
+                        padding: 12px 16px;
+                        background: #f1f5f9;
+                        border-bottom: 2px solid #e2e8f0;
+                        color: #475569;
+                        font-weight: 600;
+                    }
+                    .data-table td {
+                        padding: 12px 16px;
+                        border-bottom: 1px solid #e2e8f0;
+                        color: #334155;
+                    }
+                    .data-table tr:hover { background: #f8fafc; }
+
+                    @media (max-width: 768px) {
+                        .admin-header { flex-direction: column; gap: 15px; padding: 15px; }
+                        .admin-nav { width: 100%; justify-content: space-between; overflow-x: auto; }
+                        .admin-content { padding: 15px; }
+                        .flex-responsive { flex-direction: column !important; }
+                    }
+                `}
+            </style>
+
+            <header className="admin-header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <img src="/logo.png" alt="Logo" style={{ width: '30px', height: '30px' }} />
+                    <span style={{ fontSize: '1.2rem', fontWeight: '700' }}>Admin Console</span>
+                </div>
+
+                <nav className="admin-nav">
+                    <button className={`nav-btn ${activeTab === 'stories' ? 'active' : ''}`} onClick={() => setActiveTab('stories')}>Stories</button>
+                    <button className={`nav-btn ${activeTab === 'students' ? 'active' : ''}`} onClick={() => setActiveTab('students')}>Students</button>
+                    <button className={`nav-btn ${activeTab === 'quizzes' ? 'active' : ''}`} onClick={() => setActiveTab('quizzes')}>Quizzes</button>
+                </nav>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={() => navigate('/')} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer' }}>Home</button>
+                    <button onClick={() => { localStorage.removeItem('token'); window.location.href = '/admin/login'; }} style={{ background: '#ef4444', border: 'none', color: 'white', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer' }}>Logout</button>
+                </div>
+            </header>
+
+            <main className="admin-content">
+                {error && <div style={{ background: '#fee2e2', color: '#dc2626', padding: '15px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #fecaca' }}>{error}</div>}
+
+                {/* STORIES TAB */}
+                {activeTab === 'stories' && (
+                    <div style={{ display: 'flex', gap: '25px', flexDirection: isMobile ? 'column' : 'row' }} className="flex-responsive">
+                        {/* Sidebar: List & Create */}
+                        <div style={{ flex: 1, minWidth: '300px' }}>
+                            <div className="section-card">
+                                <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>Create Story</h3>
+                                <form onSubmit={createStory}>
+                                    <input className="form-input" value={title} onChange={e => setTitle(e.target.value)} placeholder="Story Title" required />
+                                    <input className="form-input" value={desc} onChange={e => setDesc(e.target.value)} placeholder="Short Description" required />
+                                    <button type="submit" className="primary-btn" style={{ width: '100%' }}>Create New Story</button>
+                                </form>
                             </div>
-                        ))}
-                    </div>
 
-                    {/* Editor */}
-                    <div style={{ flex: 2, padding: isMobile ? 0 : '0 20px', borderLeft: isMobile ? 'none' : '2px solid #eee', order: isMobile ? 1 : 2 }}>
-                        {selectedStory ? (
-                            <>
-                                <h2>Editing: {selectedStory.title}</h2>
-                                <div className="card" style={{ background: editingPartIndex !== null ? '#fff3e0' : '#f9f9f9', border: editingPartIndex !== null ? '2px solid orange' : 'none' }}>
-
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <h3 style={{ fontSize: isMobile ? '1rem' : '1.2rem' }}>{editingPartIndex !== null ? `✍️ Edit Part ${editingPartIndex + 1}` : '➕ Add Part'}</h3>
-                                        {editingPartIndex !== null && <button type="button" onClick={cancelEdit} style={{ fontSize: '0.8rem', padding: '5px', cursor: 'pointer' }}>❌ Cancel</button>}
-                                    </div>
-
-                                    <form onSubmit={handlePartSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        <input value={partTitle} onChange={e => setPartTitle(e.target.value)} placeholder="Part Title" required style={{ padding: '8px' }} />
-                                        <input value={videoUrl} onChange={e => setVideoUrl(e.target.value)} placeholder="Video URL" style={{ padding: '8px' }} />
-                                        <input value={quizIdForPart} onChange={e => setQuizIdForPart(e.target.value)} placeholder="Quiz ID (Optional)" style={{ padding: '8px' }} />
-                                        <textarea value={partContent} onChange={e => setPartContent(e.target.value)} placeholder="Content..." required style={{ padding: '8px', height: '100px' }} />
-
-                                        <button type="submit" style={btnStyle(editingPartIndex !== null ? '#ff9800' : '#2196f3')}>
-                                            {editingPartIndex !== null ? '💾 Update' : '➕ Add'}
-                                        </button>
-                                    </form>
-                                </div>
-                                <div style={{ marginTop: '20px' }}>
-                                    {selectedStory.parts?.map((p, i) => (
-                                        <div key={i} className="card" style={{ position: 'relative', marginBottom: '10px' }}>
-                                            <h4>Part {i + 1}: {p.title}</h4>
-                                            <div style={{ marginBottom: '5px' }}>
-                                                {p.video_url && <span style={{ fontSize: '0.8rem', background: 'red', color: 'white', padding: '2px 5px', borderRadius: '4px', marginRight: '5px' }}>🎬 Video</span>}
-                                                {p.quiz_id && <span style={{ fontSize: '0.8rem', background: 'orange', color: 'white', padding: '2px 5px', borderRadius: '4px' }}>📝 Quiz</span>}
-                                            </div>
-                                            <p style={{ color: '#555', fontSize: '0.9rem', marginTop: '5px' }}>{p.content?.substring(0, 50)}...</p>
-                                            <div style={{ position: 'absolute', right: '10px', top: '10px' }}>
-                                                <button onClick={() => startEditingPart(i)} style={{ ...btnStyle('#ff9800'), padding: '5px', marginRight: '5px' }}>✏️</button>
-                                                <button onClick={() => deletePart(i)} style={{ ...btnStyle('red'), padding: '5px' }}>🗑️</button>
-                                            </div>
+                            <div className="section-card">
+                                <h3 style={{ margin: '0 0 15px 0', color: '#0f172a' }}>Library ({stories?.length})</h3>
+                                <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                                    {stories.map(s => (
+                                        <div key={s._id} className={`list-item ${selectedStory?._id === s._id ? 'selected' : ''}`} onClick={() => setSelectedStory(s)}>
+                                            <div style={{ fontWeight: '600', color: '#0f172a' }}>{s.title}</div>
+                                            <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{s.parts?.length || 0} chapters</div>
+                                            <button onClick={(e) => deleteStory(s._id, e)} className="danger-btn" style={{ position: 'absolute', right: '10px', top: '10px' }}>Delete</button>
                                         </div>
                                     ))}
-                                    {(!selectedStory.parts || selectedStory.parts.length === 0) && <p style={{ color: '#999' }}>No parts. Add one! 👆</p>}
                                 </div>
-                            </>
-                        ) : <div style={{ textAlign: 'center', color: '#999', marginTop: '50px', padding: '20px', background: '#f0f0f0', borderRadius: '10px' }}>Select a story below to edit ⬇️</div>}
-                    </div>
-                </div>
-            )}
+                            </div>
+                        </div>
 
-            {/* STUDENTS TAB */}
-            {activeTab === 'students' && (
-                <div style={{ flex: 1, overflowX: 'auto' }}>
-                    <div className="card" style={{ minWidth: '600px' }}>
-                        <h3>🎓 Student Progress</h3>
-                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                        {/* Main: Editor */}
+                        <div style={{ flex: 2 }}>
+                            {selectedStory ? (
+                                <>
+                                    <div className="section-card">
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                            <h2 style={{ margin: 0, color: '#0f172a' }}>Editing: {selectedStory.title}</h2>
+                                            {editingPartIndex !== null && <button onClick={cancelEdit} style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}>Cancel Edit</button>}
+                                        </div>
+
+                                        <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                            <h4 style={{ margin: '0 0 15px 0', color: '#334155' }}>{editingPartIndex !== null ? 'Update Chapter' : 'Add New Chapter'}</h4>
+                                            <form onSubmit={handlePartSubmit}>
+                                                <input className="form-input" value={partTitle} onChange={e => setPartTitle(e.target.value)} placeholder="Chapter Title" required />
+                                                <div style={{ display: 'flex', gap: '10px' }}>
+                                                    <input className="form-input" value={videoUrl} onChange={e => setVideoUrl(e.target.value)} placeholder="Video URL (YouTube)" />
+                                                    <input className="form-input" value={quizIdForPart} onChange={e => setQuizIdForPart(e.target.value)} placeholder="Quiz ID (Optional)" />
+                                                </div>
+                                                <textarea className="form-input" value={partContent} onChange={e => setPartContent(e.target.value)} placeholder="Story content..." required style={{ height: '150px', resize: 'vertical' }} />
+                                                <button type="submit" className="primary-btn">{editingPartIndex !== null ? 'Save Changes' : 'Add Chapter'}</button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                        {selectedStory.parts?.map((p, i) => (
+                                            <div key={i} className="section-card" style={{ padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
+                                                <div>
+                                                    <div style={{ fontWeight: '600', color: '#0f172a' }}>Part {i + 1}: {p.title}</div>
+                                                    <div style={{ fontSize: '0.85rem', color: '#64748b' }}>{p.content?.substring(0, 60)}...</div>
+                                                    <div style={{ marginTop: '5px' }}>
+                                                        {p.video_url && <span style={{ fontSize: '0.75rem', background: '#fee2e2', color: '#dc2626', padding: '2px 6px', borderRadius: '4px', marginRight: '5px' }}>Video</span>}
+                                                        {p.quiz_id && <span style={{ fontSize: '0.75rem', background: '#fef3c7', color: '#d97706', padding: '2px 6px', borderRadius: '4px' }}>Quiz</span>}
+                                                    </div>
+                                                </div>
+                                                <div style={{ display: 'flex' }}>
+                                                    <button onClick={() => startEditingPart(i)} className="edit-btn">Edit</button>
+                                                    <button onClick={() => deletePart(i)} className="danger-btn">Delete</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px', border: '2px dashed #cbd5e1', borderRadius: '12px', color: '#94a3b8' }}>
+                                    Select a story to manage chapters
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* STUDENTS TAB */}
+                {activeTab === 'students' && (
+                    <div className="section-card" style={{ overflowX: 'auto' }}>
+                        <h3 style={{ margin: '0 0 20px 0', color: '#0f172a' }}>Registered Students</h3>
+                        <table className="data-table">
                             <thead>
-                                <tr style={{ borderBottom: '2px solid #ddd', textAlign: 'left' }}>
-                                    <th style={{ padding: '10px' }}>Name</th>
-                                    <th style={{ padding: '10px' }}>Email</th>
-                                    <th style={{ padding: '10px' }}>XP</th>
-                                    <th style={{ padding: '10px' }}>Role</th>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Email Address</th>
+                                    <th>Total XP</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {Array.isArray(students) && students.map(std => (
-                                    <tr key={std._id} style={{ borderBottom: '1px solid #eee' }}>
-                                        <td style={{ padding: '10px' }}>{std.name}</td>
-                                        <td style={{ padding: '10px' }}>{std.email}</td>
-                                        <td style={{ padding: '10px', fontWeight: 'bold', color: '#2ecc71' }}>{std.points || 0}</td>
-                                        <td style={{ padding: '10px' }}>{std.role}</td>
+                                {students.map(std => (
+                                    <tr key={std._id}>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <div style={{ width: '30px', height: '30px', background: '#e2e8f0', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{std.avatar || '👤'}</div>
+                                                {std.name}
+                                            </div>
+                                        </td>
+                                        <td>{std.email}</td>
+                                        <td><span style={{ fontWeight: '700', color: '#10b981' }}>{std.points || 0} XP</span></td>
+                                        <td><span style={{ padding: '4px 8px', borderRadius: '12px', background: '#eff6ff', color: '#3b82f6', fontSize: '0.8rem', fontWeight: '600' }}>Active</span></td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* QUIZ CREATOR TAB */}
-            {activeTab === 'quizzes' && (
-                <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '20px' }}>
-                    <div className="card" style={{ flex: 1 }}>
-                        <h3>1. Design a Quiz</h3>
-                        <div style={{ marginBottom: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '5px' }}>
-                            <label>Question:</label>
-                            <input value={quizQuestion} onChange={e => setQuizQuestion(e.target.value)} style={{ width: '100%', padding: '8px', marginBottom: '10px' }} />
+                {/* QUIZZES TAB */}
+                {activeTab === 'quizzes' && (
+                    <div style={{ display: 'flex', gap: '25px', flexDirection: isMobile ? 'column' : 'row' }} className="flex-responsive">
+                        <div className="section-card" style={{ flex: 1 }}>
+                            <h3 style={{ margin: '0 0 15px 0' }}>Quiz Creator</h3>
+                            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: '#475569', display: 'block', marginBottom: '5px' }}>Question Text</label>
+                                <input className="form-input" value={quizQuestion} onChange={e => setQuizQuestion(e.target.value)} placeholder="e.g. What is a variable?" />
 
-                            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
-                                <input value={opt1} onChange={e => setOpt1(e.target.value)} placeholder="Option 1" style={{ padding: '8px' }} />
-                                <input value={opt2} onChange={e => setOpt2(e.target.value)} placeholder="Option 2" style={{ padding: '8px' }} />
-                                <input value={opt3} onChange={e => setOpt3(e.target.value)} placeholder="Option 3" style={{ padding: '8px' }} />
-                                <select value={correctIdx} onChange={e => setCorrectIdx(e.target.value)} style={{ padding: '8px' }}>
-                                    <option value={0}>Correct: Option 1</option>
-                                    <option value={1}>Correct: Option 2</option>
-                                    <option value={2}>Correct: Option 3</option>
-                                </select>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }}>
+                                    <input className="form-input" value={opt1} onChange={e => setOpt1(e.target.value)} placeholder="Option A" />
+                                    <input className="form-input" value={opt2} onChange={e => setOpt2(e.target.value)} placeholder="Option B" />
+                                    <input className="form-input" value={opt3} onChange={e => setOpt3(e.target.value)} placeholder="Option C" />
+                                    <select className="form-input" value={correctIdx} onChange={e => setCorrectIdx(e.target.value)}>
+                                        <option value={0}>Correct: Option A</option>
+                                        <option value={1}>Correct: Option B</option>
+                                        <option value={2}>Correct: Option C</option>
+                                    </select>
+                                </div>
+                                <button onClick={addQuestionToBuffer} className="primary-btn" style={{ width: '100%', marginTop: '10px', background: '#f59e0b' }}>Add to Quiz</button>
                             </div>
-                            <button onClick={addQuestionToBuffer} style={btnStyle('#ff9800', '100%')}>Add Question</button>
+
+                            <div style={{ marginTop: '20px' }}>
+                                <h4>Current Questions ({currentQuestions.length})</h4>
+                                <ul style={{ paddingLeft: '20px', color: '#475569' }}>
+                                    {currentQuestions.map((q, i) => (
+                                        <li key={i} style={{ marginBottom: '5px' }}>{q.question}</li>
+                                    ))}
+                                </ul>
+                                {currentQuestions.length > 0 && <button onClick={saveQuiz} className="primary-btn" style={{ width: '100%' }}>Save Final Quiz</button>}
+                            </div>
                         </div>
 
-                        <h4>Questions: {currentQuestions.length}</h4>
-                        <ul>
-                            {currentQuestions.map((q, i) => (
-                                <li key={i}>{q.question}</li>
-                            ))}
-                        </ul>
-                        {currentQuestions.length > 0 && (
-                            <button onClick={saveQuiz} style={btnStyle('#2196f3', '100%')}>💾 Save Quiz</button>
-                        )}
+                        <div className="section-card" style={{ flex: 1 }}>
+                            <h3 style={{ margin: '0 0 15px 0' }}>Generated Quiz Details</h3>
+                            {createdQuizId ? (
+                                <div style={{ textAlign: 'center', padding: '40px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px' }}>
+                                    <div style={{ fontSize: '3rem', marginBottom: '10px' }}>✅</div>
+                                    <h4 style={{ margin: 0, color: '#166534' }}>Quiz Created Successfully!</h4>
+                                    <p style={{ color: '#15803d' }}>Copy this ID to attach it to a Story Chapter:</p>
+                                    <code style={{ display: 'block', padding: '15px', background: 'white', border: '2px solid #86efac', borderRadius: '8px', fontSize: '1.2rem', fontWeight: 'bold', color: '#166534', margin: '20px 0' }}>
+                                        {createdQuizId}
+                                    </code>
+                                </div>
+                            ) : (
+                                <div style={{ textAlign: 'center', color: '#94a3b8', padding: '40px' }}>
+                                    Create and save a quiz to generate an ID here.
+                                </div>
+                            )}
+                        </div>
                     </div>
-
-                    <div className="card" style={{ flex: 1, background: '#e3f2fd' }}>
-                        <h3>2. Use Quiz ID</h3>
-                        <p>Copy ID & paste in Story Part:</p>
-                        {createdQuizId && (
-                            <div style={{ padding: '20px', background: 'white', borderRadius: '10px', textAlign: 'center', overflowWrap: 'anywhere' }}>
-                                <code style={{ fontSize: '1.2rem', display: 'block', margin: '10px' }}>{createdQuizId}</code>
-                                <small>Copied!</small>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
+                )}
+            </main>
         </div>
     );
 }
-
-// Helpers
-const tabStyle = (active) => ({
-    padding: '10px 20px',
-    border: 'none',
-    background: active ? '#4ECDC4' : 'transparent',
-    color: active ? 'white' : '#ecf0f1', // Light grey for inactive
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    borderRadius: '8px',
-    transition: '0.3s'
-});
-
-const btnStyle = (bg, width = 'auto') => ({
-    padding: '10px 15px',
-    background: bg,
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    width: width
-});
-
-const itemStyle = {
-    padding: '15px',
-    background: 'white',
-    borderRadius: '10px',
-    marginBottom: '10px',
-    position: 'relative',
-    cursor: 'pointer'
-};
 
 export default Admin;

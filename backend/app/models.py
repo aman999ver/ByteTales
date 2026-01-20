@@ -22,7 +22,11 @@ class StudentDB(StudentBase):
     face_encoding: Optional[List[float]] = None
     role: str = "student"
     points: int = 0
-    avatar: Optional[str] = None # Added avatar field
+    avatar: Optional[str] = None
+    completed_stories: List[str] = []
+    completed_quizzes: List[str] = []
+    streak_days: int = 0
+    last_active_date: Optional[str] = None # YYYY-MM-DD
     model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 
 class StudentUpdate(BaseModel):

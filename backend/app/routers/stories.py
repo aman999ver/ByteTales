@@ -19,12 +19,12 @@ def get_current_admin(user: StudentDB = Depends(get_current_user)):
     return user
 
 # Basic Story CRUD
-@router.get("/", response_model=List[Story])
+@router.get("", response_model=List[Story])
 async def get_stories():
     stories = await db.stories.find().to_list(100)
     return stories
 
-@router.post("/", response_model=Story)
+@router.post("", response_model=Story)
 async def create_story(story: Story, admin: StudentDB = Depends(get_current_admin)):
     new_story = await db.stories.insert_one(story.model_dump(by_alias=True, exclude={"id"}))
     created_story = await db.stories.find_one({"_id": new_story.inserted_id})
@@ -138,7 +138,10 @@ async def submit_quiz(quiz_id: str, submission: QuizSubmission, current_user: St
     if score > 0:
         await db.students.update_one(
             {"email": current_user.email},
-            {"$inc": {"points": score}}
+            {
+                "$inc": {"points": score},
+                "$addToSet": {"completed_quizzes": quiz_id} 
+            }
         )
         
     return {
@@ -147,6 +150,28 @@ async def submit_quiz(quiz_id: str, submission: QuizSubmission, current_user: St
         "total_questions": len(quiz['questions']),
         "points_awarded": score
     }
+
+from ..utils import update_streak
+
+# ... imports ...
+
+@router.post("/{story_id}/complete")
+async def complete_story(story_id: str, current_user: StudentDB = Depends(get_current_user)):
+    # Verify story exists
+    if not await db.stories.find_one({"_id": ObjectId(story_id)}):
+        raise HTTPException(status_code=404, detail="Story not found")
+
+    # Update Streak
+    await update_streak(current_user.email)
+
+    await db.students.update_one(
+        {"email": current_user.email},
+        {
+            "$addToSet": {"completed_stories": story_id},
+            "$inc": {"points": 100} # Award 100 XP
+        }
+    )
+    return {"message": "Story marked as completed, +100 XP"}
 
 @router.post("/seed")
 async def seed_data():
